@@ -1,0 +1,12 @@
+{
+  "name": "source-code-evaluator",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "\\",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "vm2": "^3.5.2"
+  }
+}

@@ -1,0 +1,15 @@
+[
+    {
+        "name": "hello world",
+        "description": "write a function named helloWorld that will return the string Hello World!",
+        "tests": ["helloWorld() == 'Hello World!'"]
+    },
+    {
+        "name": "greet",
+        "description": "Write a function called greet that will return Hello [parameter], e.g. Hello Theo if the value of the first parameter is Theo. If the name is blank, It should say hello you.",
+        "tests": [
+            "greet() == 'Hello you'",
+            "greet('Theo') == 'Hello Theo'"
+        ]
+    }
+]
