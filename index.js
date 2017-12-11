@@ -9,6 +9,8 @@ const app = express();
 
 app.use(bodyParser.json());
 
+const saveSubmission = require('./commands/save-submission.js');
+
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -33,41 +35,51 @@ app.get('/assignments',async (req,res) => {
 });
 
 app.post('/assignment/submit', async function(req,res){
-    const {NodeVM} = require('vm2');
+  console.log('body', req.body);
+  const {NodeVM} = require('vm2');
 
-    const vm = new NodeVM({
-        timeout: 1000,
-        sandbox: {},
-        wrapper: 'none'
-    });
+  const vm = new NodeVM({
+    timeout: 1000,
+    sandbox: {},
+    wrapper: 'none'
+  });
 
-    try {
+  try {
 
-        var assignment = await getAssignment(req.body.assignment);
-        var testResults = [];
+    var assignment = await getAssignment(req.body.assignment);
+    var testResults = [];
 
-        for (var test of assignment.tests) {
-            console.log(req.body.code + ";" + test);
-            var codeResult = vm.run(req.body.code + "; return " + test);
-            testResults.push({
-                result: codeResult,
-                test: test
-            });
-        }
-
-        res.json({result: testResults});
+    for (var test of assignment.tests) {
+      console.log(req.body.code + ";" + test);
+      try {
+        var codeResult = vm.run(req.body.code + "; return " + test);
+        testResults.push({
+          passed: codeResult,
+          test: test
+        });
+      }
+      catch(e){
+        testResults.push({result: e.message,
+                          test:test});
+      }
     }
-    catch(e) {
-        console.log(e);
-        res.sendStatus(400).end(e.message);
-    }
+
+    await saveSubmission(req.body, testResults);
+
+    res.json({result: testResults});
+  }
+  catch(e) {
+    console.log(e);
+    res.sendStatus(400).end(e.message);
+  }
 });
 
 
 async function getAssignment(assignmentName){
-  var assignments = getAssignments();
-    var assignment = assignments.find(a => a.name == assignmentName);
-    return assignment;
+  var assignments = await getAssignments();
+  console.log("assignments = ", assignments);
+  var assignment = assignments.find(a => a.name == assignmentName);
+  return assignment;
 }
 
 async function getAssignments(){
